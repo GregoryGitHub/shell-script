@@ -15,24 +15,26 @@
 #           saída.
 # Versão 6: Adiciona as opçoes -r,--reverse,-u,--uppercase
 #           Leitura de múltiplas opções
+# Versão 7: Adiciona opção --delimiter para configurar a saída.
 #
 #
 # José Henrique <henriquegreg45@gmail.com>
 # data de criação 13/12/2019
 
-ordenar=0 # A saída deve ser ordenada de forma alfabética?
+ordenar=0   # A saída deve ser ordenada de forma alfabética?
 maiuscula=0 # A saída de ser toda maiúscula?
-inverte=0 # A saida ordenada deve ser invertida?
-
+inverte=0   # A saida ordenada deve ser invertida?
+delim='\t'  # Caracter usado como delimitador de saída padrão
 MSG_USO="
 
     Uso: $(basename $0) [OPÇÕES]
-
-        -r,--reverse     Inverte a listagem.
-        -s,--sort        Ordena a saída alfabeticamente.
-        -u,--uppercase   Mostra a listagem em maiúsculas.
-        -V,--version     Mostra a versão do programa e sai.
-        -h,--help        Mostra essa tela de ajuda e sai.
+    
+        -d,--delimiter C  Usa o caracter C como delimitador
+        -r,--reverse      Inverte a listagem.
+        -s,--sort         Ordena a saída alfabeticamente.
+        -u,--uppercase    Mostra a listagem em maiúsculas.
+        -V,--version      Mostra a versão do programa e sai.
+        -h,--help         Mostra essa tela de ajuda e sai.
 
 "
 # Tratamento das opções de linha de comando.
@@ -44,6 +46,15 @@ do
     -r|--reverse) inverte=1 ;;
     -u|--uppercase) maiuscula=1 ;;
 
+    -d|--delimiter)
+        shift
+        delim="$1"
+        if test -z "$delim"
+        then
+            echo "Faltou o argumento para -d ou --delimiter."
+            exit 1
+        fi 
+    ;;
     -h|--help)
         echo "$MSG_USO"
         exit 0
@@ -81,4 +92,4 @@ test "$maiuscula" = 1 && lista=$(echo "$lista" | tr a-z A-Z)
 test "$inverte" = 1 && lista=$(echo "$lista" | tac)
 
 # Mostra o resultado para o usuário
-echo "$lista" | tr : \\t
+echo "$lista" | tr : "$delim"
